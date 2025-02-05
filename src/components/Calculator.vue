@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { roundNumber, isResultValid, evaluateCalculationAsString } from '../utils/calculatorUtils';
+import axios from 'axios';
+import { roundNumber, getApiResponse } from '../utils/calculatorUtils';
 const display= defineModel<string>({required:true});
 var log = ref("");
 
@@ -31,12 +32,15 @@ function deleteLastCharacterInDisplay() {
   display.value = display.value.slice(0, display.value.length-1);
 }
 
-function calculateResult() {
+async function calculateResult() {
   const calculationAsString:string = display.value;
   
-  let result = evaluateCalculationAsString(calculationAsString);
-
-  if(!isResultValid(result)) {
+  let result;
+  try {
+    let apiResponse = await getApiResponse(calculationAsString);
+    console.log(apiResponse);
+    result = apiResponse.data["result"];
+  } catch (error) {
     alert("Invalid computation");
     return;
   }
